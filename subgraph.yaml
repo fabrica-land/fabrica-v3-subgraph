@@ -1,0 +1,70 @@
+specVersion: 0.0.5
+description: Fabrica v3 Tokens
+repository: https://github.com/fabrica-land/fabrica-v3-subgraph
+features:
+  - ipfsOnEthereumContracts
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: FabricaToken
+    network: sepolia
+    source:
+      address: "0xb52ED2Dc8EBD49877De57De3f454Fd71b75bc1fD"
+      abi: FabricaToken
+      startBlock: 4056180
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Balance
+        - ConfigurationUpdate
+        - OperatingAgreementUpdate
+        - Token
+        - Transfer
+        - UriUpdate
+        - User
+        - ValidatorUpdate
+      abis:
+        - name: FabricaToken
+          file: ./abis/FabricaToken.json
+      eventHandlers:
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: UpdateConfiguration(uint256,string)
+          handler: handleUpdateConfiguration
+        - event: UpdateOperatingAgreement(uint256,string)
+          handler: handleUpdateOperatingAgreement
+        - event: UpdateValidator(uint256,string,address)
+          handler: handleUpdateValidator
+        - event: URI(string,indexed uint256)
+          handler: handleUriChanged
+      file: ./src/fabrica-token.ts
+templates:
+  - name: FabricaTokenDefinition
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/fabrica-token.ts
+      handler: handleTokenTokenDefinition
+      entities:
+        - FabricaTokenDefinition
+      abis:
+        - name: FabricaToken
+          file: ./abis/FabricaToken.json
+  - name: FabricaTokenConfiguration
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/fabrica-token.ts
+      handler: handleTokenTokenConfiguration
+      entities:
+        - FabricaTokenConfiguration
+      abis:
+        - name: FabricaToken
+          file: ./abis/FabricaToken.json

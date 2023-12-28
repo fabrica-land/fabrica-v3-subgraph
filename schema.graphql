@@ -1,0 +1,267 @@
+#scalar Bytes
+#scalar BigDecimal
+#scalar BigInt
+#directive @entity(immutable: Boolean) on OBJECT
+#directive @derivedFrom(field: String) on FIELD_DEFINITION
+
+type FabricaToken @entity(immutable: false) {
+  id: Bytes!
+  tokenId: BigInt!
+  supply: BigInt!
+  transfers: [Transfer!] @derivedFrom(field: "token")
+  balances: [Balance!] @derivedFrom(field: "token")
+  creator: Wallet!
+  uri: String!
+  definitionUrl: String!
+  "Fabrica token definition content from IPFS"
+  definition: FabricaTokenDefinition
+  configurationUrl: String!
+  "Fabrica token configuration content from IPFS"
+  configuration: FabricaTokenConfiguration
+  operatingAgreement: String!
+  validator: Bytes!
+}
+
+type FabricaTokenDefinition @entity(immutable: true) {
+  id: Bytes!
+  ipfsHash: String!
+  claim: String!
+  coordinates: Coordinates!
+  geoJson: String
+  holdingEntity: String!
+  offchainRegistrar: OffchainRegistrar
+}
+
+type Coordinates @entity(immutable: true) {
+  id: Bytes!
+  lat: BigDecimal!
+  lon: BigDecimal!
+}
+
+type OffchainRegistrar @entity(immutable: true) {
+  id: Bytes!
+  country: String!
+  admin: String!
+  adminId: String!
+  propertyId: String!
+}
+
+type FabricaTokenConfiguration @entity(immutable: false) {
+  id: Bytes!
+  ipfsHash: String!
+  proofOfTitle: ProofOfTitle
+  propertyNickName: String
+  userDescription: String
+  media: [FabricaTokenMedia!] @derivedFrom(field: "configuration")
+  documents: [FabricaTokenDocument!] @derivedFrom(field: "configuration")
+  vendor: String
+  vendorId: String
+}
+
+type ProofOfTitle @entity(immutable: true) {
+  id: Bytes!
+  document: String
+  documentId: String
+  documentName: String
+  source: String
+}
+
+type FabricaTokenMedia @entity(immutable: false) {
+  id: Bytes!
+  configuration: FabricaTokenConfiguration!
+  type: String!
+  source: String!
+  description: String
+  order: BigDecimal
+}
+
+type FabricaTokenDocument @entity(immutable: false) {
+  id: Bytes!
+  configuration: FabricaTokenConfiguration!
+  type: String!
+  source: String!
+  description: String
+  order: BigDecimal
+}
+
+type Balance @entity(immutable: false) {
+  id: Bytes!
+  token: FabricaToken!
+  owner: Wallet!
+  holder: Wallet!
+  balance: BigInt!
+}
+
+type Wallet @entity(immutable: false) {
+  id: Bytes!
+  address: Bytes!
+  tokenCount: BigInt!
+  tokens: [Balance!] @derivedFrom(field: "holder")
+  created: [FabricaToken!] @derivedFrom(field: "creator")
+  obligationReceipts: [ObligationReceipt!] @derivedFrom(field: "holder")
+  lending: [Loan!] @derivedFrom(field: "lender")
+  borrowing: [Loan!] @derivedFrom(field: "borrower")
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  operator: Bytes!
+  from: Wallet
+  to: Wallet
+  token: FabricaToken!
+  value: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ConfigurationUpdate @entity(immutable: true) {
+  id: Bytes!
+  token: FabricaToken!
+  newValue: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OperatingAgreementUpdate @entity(immutable: true) {
+  id: Bytes!
+  token: FabricaToken!
+  newValue: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UriUpdate @entity(immutable: true) {
+  id: Bytes!
+  token: FabricaToken!
+  newValue: String!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ValidatorUpdate @entity(immutable: true) {
+  id: Bytes!
+  token: FabricaToken!
+  newValue: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+enum LoanStatus {
+  ActiveOrDefault,
+  Liquidated,
+  Repaid,
+}
+
+type Loan @entity(immutable: false) {
+  id: Bytes!
+  loanContract: Bytes!
+  loanId: BigInt!
+  loanStatus: LoanStatus!
+  borrower: Wallet!
+  lender: Wallet!
+  loanPrincipalAmount: BigInt!
+  maximumRepaymentAmount: BigInt!
+  nftCollateralId: BigInt!
+  loanERC20Denomination: Bytes!
+  loanDuration: BigInt!
+  loanInterestRateForDurationInBasisPoints: Int!
+  loanAdminFeeInBasisPoints: Int!
+  nftCollateralWrapper: Bytes!
+  loanStartTime: BigInt!
+  nftCollateralContract: Bytes!
+  revenueSharePartner: Bytes!
+  revenueShareInBasisPoints: Int!
+  referralFeeInBasisPoints: Int!
+  loanMaturityDate: BigInt
+  loanLiquidationDate: BigInt
+  totalRenegotiationFeesPaid: BigInt!
+  totalRenegotiationAdminFeesPaid: BigInt!
+  amountPaidToLender: BigInt
+  adminFeePaid: BigInt
+  revenueSharePaid: BigInt
+}
+
+type LoanLiquidatedEvent @entity(immutable: true) {
+  id: Bytes!
+  loan: Loan!
+  borrower: Wallet!
+  lender: Wallet!
+  loanPrincipalAmount: BigInt!
+  nftCollateralId: BigInt!
+  loanMaturityDate: BigInt!
+  loanLiquidationDate: BigInt!
+  nftCollateralContract: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanRenegotiatedEvent @entity(immutable: true) {
+  id: Bytes!
+  loan: Loan!
+  borrower: Wallet!
+  lender: Wallet!
+  newLoanDuration: BigInt!
+  newMaximumRepaymentAmount: BigInt!
+  renegotiationFee: BigInt!
+  renegotiationAdminFee: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanRepaidEvent @entity(immutable: true) {
+  id: Bytes!
+  loan: Loan!
+  borrower: Wallet!
+  lender: Wallet!
+  loanPrincipalAmount: BigInt!
+  nftCollateralId: BigInt!
+  amountPaidToLender: BigInt!
+  adminFee: BigInt!
+  revenueShare: BigInt!
+  revenueSharePartner: Bytes!
+  nftCollateralContract: Bytes!
+  loanERC20Denomination: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LoanStartedEvent @entity(immutable: true) {
+  id: Bytes!
+  loan: Loan!
+  borrower: Wallet!
+  lender: Wallet!
+  loanPrincipalAmount: BigInt!
+  maximumRepaymentAmount: BigInt!
+  nftCollateralId: BigInt!
+  loanERC20Denomination: Bytes!
+  loanDuration: BigInt!
+  loanInterestRateForDurationInBasisPoints: Int!
+  loanAdminFeeInBasisPoints: Int!
+  nftCollateralWrapper: Bytes!
+  loanStartTime: BigInt!
+  nftCollateralContract: Bytes!
+  revenueSharePartner: Bytes!
+  revenueShareInBasisPoints: Int!
+  referralFeeInBasisPoints: Int!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ObligationReceipt @entity(immutable: false) {
+  id: Bytes!
+  receiptTokenId: BigInt!
+  loan: Loan!
+  nftCollateralContract: Bytes!
+  nftCollateralId: BigInt!
+  creator: Wallet!
+  holder: Wallet!
+}

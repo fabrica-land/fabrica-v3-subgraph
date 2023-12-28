@@ -1,0 +1,36 @@
+{
+  "mainnet": {
+    "FabricaToken": {
+      "address": "0x5cbeb7a0df7ed85d82a472fd56d81ed550f3ea95",
+      "startBlock": 17928907
+    },
+    "NftfiDirectLoanFixed": {
+      "address": "0xd0a40eB7FD94eE97102BA8e9342243A2b2E22207",
+      "startBlock": 18220510
+    },
+    "NftfiObligationReceipt": {
+      "address": "0xAAbd3EBCc6AE1e87150c6184C038b94dC01a7708",
+      "startBlock": 18220516
+    }
+  },
+  "goerli": {
+    "FabricaToken": {
+      "address": "0xE259e3626E282711DA4d988192cd807DB44CD7a0",
+      "startBlock": 8343730
+    },
+    "NftfiDirectLoanFixed": {
+      "address": "0x2f42800C426237e535cA9eCccdC38F794f26F6e3",
+      "startBlock": 9762996
+    },
+    "NftfiObligationReceipt": {
+      "address": "0xDeE9b6E2f1aa9c14214d87d2911f3550ef1A87bB",
+      "startBlock": 9763001
+    }
+  },
+  "sepolia": {
+    "FabricaToken": {
+      "address": "0xb52ED2Dc8EBD49877De57De3f454Fd71b75bc1fD",
+      "startBlock": 4056180
+    }
+  }
+}
