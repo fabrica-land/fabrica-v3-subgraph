@@ -2,12 +2,18 @@
   "name": "fabrica-v3-subgraph",
   "license": "UNLICENSED",
   "scripts": {
+    "clean": "del build generated",
     "codegen": "graph codegen",
+    "rebuild": "yarn clean && yarn codegen && yarn build",
     "build": "graph build",
     "deploy": "graph deploy fabrica-sepolia-staging --node https://subgraphs.alchemy.com/api/subgraphs/deploy --deploy-key=${ALCHEMY_DEPLOY_KEY}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.64.1",
-    "@graphprotocol/graph-ts": "0.32.0"
+    "@graphprotocol/graph-ts": "0.32.0",
+    "assemblyscript-json": "^1.1.0"
+  },
+  "devDependencies": {
+    "del-cli": "^5.1.0"
   }
 }

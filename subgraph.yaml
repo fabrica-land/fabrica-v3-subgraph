@@ -6,8 +6,8 @@ features:
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
-    name: FabricaToken
+  - name: FabricaToken
+    kind: ethereum
     network: sepolia
     source:
       address: "0xb52ED2Dc8EBD49877De57De3f454Fd71b75bc1fD"
@@ -23,25 +23,30 @@ dataSources:
         - OperatingAgreementUpdate
         - Token
         - Transfer
-        - UriUpdate
         - User
         - ValidatorUpdate
       abis:
         - name: FabricaToken
           file: ./abis/FabricaToken.json
-      eventHandlers:
-        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
-          handler: handleTransferBatch
-        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleTransferSingle
-        - event: UpdateConfiguration(uint256,string)
+      callHandlers:
+        - function: burn(address,uint256,uint256)
+          handler: handleBurn
+        - function: burnBatch(address,uint256[],uint256[])
+          handler: handleBurnBatch
+        - function: mint(address[],uint256,uint256[],string,string,string,address)
+          handler: handleMint
+        - function: mintBatch(address[],uint256[],uint256[],string[],string[],string[],address[])
+          handler: handleMintBatch
+        - function: safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
+          handler: handleBatchTransferFrom
+        - function: safeTransferFrom(address,address,uint256,uint256,bytes)
+          handler: handleTransferFrom
+        - function: updateConfiguration(string,uint256)
           handler: handleUpdateConfiguration
-        - event: UpdateOperatingAgreement(uint256,string)
+        - function: updateOperatingAgreement(string,uint256)
           handler: handleUpdateOperatingAgreement
-        - event: UpdateValidator(uint256,string,address)
+        - function: updateValidator(address,uint256)
           handler: handleUpdateValidator
-        - event: URI(string,indexed uint256)
-          handler: handleUriChanged
       file: ./src/fabrica-token.ts
 templates:
   - name: FabricaTokenDefinition
@@ -50,9 +55,11 @@ templates:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/fabrica-token.ts
-      handler: handleTokenTokenDefinition
+      handler: handleFabricaTokenDefinition
       entities:
+        - Coordinates
         - FabricaTokenDefinition
+        - OffchainRegistrar
       abis:
         - name: FabricaToken
           file: ./abis/FabricaToken.json
@@ -62,9 +69,12 @@ templates:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/fabrica-token.ts
-      handler: handleTokenTokenConfiguration
+      handler: handleFabricaTokenConfiguration
       entities:
         - FabricaTokenConfiguration
+        - FabricaTokenDocument
+        - FabricaTokenMedia
+        - ProofOfTitle
       abis:
         - name: FabricaToken
           file: ./abis/FabricaToken.json

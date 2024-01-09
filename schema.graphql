@@ -11,7 +11,6 @@ type FabricaToken @entity(immutable: false) {
   transfers: [Transfer!] @derivedFrom(field: "token")
   balances: [Balance!] @derivedFrom(field: "token")
   creator: Wallet!
-  uri: String!
   definitionUrl: String!
   "Fabrica token definition content from IPFS"
   definition: FabricaTokenDefinition
@@ -24,7 +23,6 @@ type FabricaToken @entity(immutable: false) {
 
 type FabricaTokenDefinition @entity(immutable: true) {
   id: Bytes!
-  ipfsHash: String!
   claim: String!
   coordinates: Coordinates!
   geoJson: String
@@ -48,7 +46,6 @@ type OffchainRegistrar @entity(immutable: true) {
 
 type FabricaTokenConfiguration @entity(immutable: false) {
   id: Bytes!
-  ipfsHash: String!
   proofOfTitle: ProofOfTitle
   propertyNickName: String
   userDescription: String
@@ -125,15 +122,6 @@ type ConfigurationUpdate @entity(immutable: true) {
 }
 
 type OperatingAgreementUpdate @entity(immutable: true) {
-  id: Bytes!
-  token: FabricaToken!
-  newValue: String!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type UriUpdate @entity(immutable: true) {
   id: Bytes!
   token: FabricaToken!
   newValue: String!
